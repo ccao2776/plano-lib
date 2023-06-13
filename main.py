@@ -75,7 +75,7 @@ def handle_scheduling(driver):
                 break
 
             if check_interval(study_room, start_time, end_time):
-                print("We have found a good interval")
+                print("We have found a good interval", st, et)
             else:
                 print("interval", st, et, "Not Available")
             
@@ -116,11 +116,14 @@ def check_interval(study_room, st, et):
     et: int
     return: boolean
     """
-    print("CHECKING: ", st, et)
     while st != et:
         time_block = time_to_attr(st)
-        print(time_block)
+        time_block_element = study_room.find_element(By.XPATH, "//div[@data-time='" + time_block + '\']')
+        if "booked" in time_block_element.get_attribute("class"):
+            return False
         st = increment_time(st)
+    
+    return "booked" not in study_room.find_element(By.XPATH, "//div[@data-time='" + time_to_attr(et) + '\']')
 
 def handle_information_form():
     pass
