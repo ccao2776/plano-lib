@@ -56,13 +56,71 @@ def handle_scheduling(driver):
     # append WebElements that contains parasable studyrooms
     for room in rooms:
         heading = room.find_element(By.TAG_NAME, "h3")
-        if "Study" in heading:
+        if "Study" in heading.text:
+            print(heading.text)
             study_rooms.append(room)
     
     # schedule based on first room availability
     for study_room in study_rooms:
-        
+        # attribute lookup format for WebElement
+        start_time = "12.00"
+        end_time = "2.00"
+
+        print(study_room)
+        while start_time != end_time:
+            st = time_to_attr(start_time)
+            et = time_to_attr(end_time)
+
+            if et == "8:45 pm":
+                break
+
+            if check_interval(study_room, start_time, end_time):
+                print("We have found a good interval")
+            else:
+                print("interval", st, et, "Not Available")
+            
+            # increment start and end time by intervals of 15 minutes
+            start_time = increment_time(start_time)
+            end_time = increment_time(end_time)
+
+def time_to_attr(time):
+    time = str(time).split(".")
+
+    hour = time[0]
+    minutes = time[1]
+
+    if len(minutes) == 1:
+        minutes = minutes + "0"
+
+    return hour + ":" + minutes + " pm"
+
+def increment_time(time):
+    time = str(time).split(".")
+
+    hour = int(time[0])
+    minutes = int(time[1]) + 15
     
+    if minutes == 60:
+        hour = hour + 1
+        minutes = "00"
+    
+    if hour > 12:
+        hour = 1
+
+    return str(hour) + "." + str(minutes)
+
+def check_interval(study_room, st, et):
+    """
+    study_room: webdriver element
+    st: int
+    et: int
+    return: boolean
+    """
+    print("CHECKING: ", st, et)
+    while st != et:
+        time_block = time_to_attr(st)
+        print(time_block)
+        st = increment_time(st)
 
 def handle_information_form():
     pass
@@ -70,5 +128,7 @@ def handle_information_form():
 def usage():
     pass
 
+
 if __name__ == '__main__':
     main()
+    
